@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jessy's 2026 Travel Adventure Planner</title>
+<style>
+:root{
+--bg:#fffaf6;
+--ink:#334155;
+--muted:#64748b;
+--card:#ffffffcc;
+--shadow:0 12px 30px rgba(51,65,85,.12);
+--radius:24px;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family: "Times New Roman", Times, serif;
+color:var(--ink);
+background:
+radial-gradient(circle at top left,#ffe4ec 0,#fffaf6 32%,#e9f7ff 100%);
+min-height:100vh;
+}
+header{
+padding:28px 20px 18px;
+text-align:center;
+}
+h1{
+margin:0;
+font-size:clamp(28px,4vw,52px);
+color:#475569;
+}
+.subtitle{
+margin:10px auto 0;
+max-width:900px;
+font-size:18px;
+color:var(--muted);
+}
+.topbar{
+display:flex;
+gap:10px;
+justify-content:center;
+flex-wrap:wrap;
+padding:10px 16px 20px;
+}
+button, .mini-btn{
+border:0;
+border-radius:999px;
+padding:12px 18px;
+font-weight:800;
+cursor:pointer;
+color:#475569;
+background:#fff;
+box-shadow:0 6px 16px rgba(51,65,85,.12);
+transition:.2s;
+}
+button:hover{transform:translateY(-2px)}
+.save{background:#dcfce7}
+.reset{background:#fee2e2}
+.print{background:#e0f2fe}
+.tabs{
+display:flex;
+gap:10px;
+padding:12px;
+overflow-x:auto;
+position:sticky;
+top:0;
+background:rgba(255,250,246,.86);
+backdrop-filter:blur(10px);
+z-index:20;
+border-top:1px solid #ffffff99;
+border-bottom:1px solid #ffffff99;
+}
+.tab-btn{
+min-width:max-content;
+box-shadow:none;
+border:3px solid transparent;
+}
+.tab-btn.active{border-color:#475569; transform:translateY(-2px)}
+.taiwan{background:#fde2e4}
+.thailand{background:#fff1b8}
+.camiguin{background:#d8f3dc}
+.boracay{background:#dbeafe}
+.sgkl{background:#ede9fe}
+.sokor{background:#fce7f3}
+.notes{background:#ffedd5}
+main{max-width:1200px; margin:0 auto; padding:20px}
+.panel{display:none; animation:fade .25s ease}
+.panel.active{display:block}
+@keyframes fade{from{opacity:.35; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+.hero{
+border-radius:var(--radius);
+padding:28px;
+box-shadow:var(--shadow);
+margin-bottom:22px;
+background:var(--card);
+border:4px solid #fff;
+}
+.hero h2{
+margin:0 0 8px;
+font-size:clamp(26px,3vw,42px);
+}
+.hero-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:14px;
+margin-top:18px;
+}
+.info{
+padding:16px;
+background:#ffffffaa;
+border-radius:18px;
+border:2px dashed #ffffff;
+min-height:88px;
+}
+.label{font-size:13px; color:var(--muted); font-weight:800; text-transform:uppercase}
+.value{font-size:20px; margin-top:5px; font-weight:900}
+.days{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+gap:18px;
+}
+.day-card{
+background:var(--card);
+border-radius:22px;
+padding:18px;
+box-shadow:var(--shadow);
+border:4px solid #fff;
+}
+.day-title{
+font-size:24px;
+font-weight:900;
+margin-bottom:10px;
+}
+.editable{
+width:100%;
+min-height:90px;
+border:2px dashed #cbd5e1;
+border-radius:16px;
+padding:12px;
+background:#fff;
+outline:none;
+font-size:17px;
+line-height:1.5;
+white-space:pre-wrap;
+}
+.editable:focus{
+border-color:#64748b;
+box-shadow:0 0 0 4px rgba(100,116,139,.12);
+}
+.small-note{font-size:14px; color:var(--muted); margin-top:10px}
+textarea{
+width:100%;
+min-height:480px;
+border:0;
+border-radius:22px;
+padding:20px;
+font-size:18px;
+line-height:1.6;
+color:var(--ink);
+box-shadow:var(--shadow);
+outline:none;
+}
+details{
+margin-top:12px;
+background:#ffffff99;
+border-radius:16px;
+padding:12px;
+}
+summary{font-weight:900; cursor:pointer}
+ul{padding-left:22px}
+@media print{
+.tabs,.topbar{display:none}
+.panel{display:block; page-break-after:always}
+body{background:white}
+.day-card,.hero,textarea{box-shadow:none}
+}
+
+.toggle-btn{
+margin:10px 0 14px;
+background:#ffffff;
+border:2px solid #cbd5e1;
+}
+.trip-details{display:none;}
+.trip-details.show{display:grid;}
+.time-line{
+font-weight:900;
+display:inline;
+}
+
+
+.money{background:#ccfbf1}
+.budget-box{
+margin-top:14px;
+padding:14px;
+background:#fff;
+border:2px dashed #cbd5e1;
+border-radius:16px;
+font-size:17px;
+line-height:1.5;
+}
+.budget-title{
+font-weight:900;
+font-size:19px;
+margin-bottom:8px;
+}
+.money-table{
+width:100%;
+border-collapse:collapse;
+margin-top:14px;
+background:#fff;
+border-radius:18px;
+overflow:hidden;
+box-shadow:var(--shadow);
+}
+.money-table th,.money-table td{
+border:1px solid #cbd5e1;
+padding:10px;
+text-align:left;
+font-size:16px;
+}
+.money-table th{background:#f8fafc}
+.money-table input,.money-table select{
+width:100%;
+padding:9px;
+border:1px solid #cbd5e1;
+border-radius:10px;
+font-family:"Times New Roman", Times, serif;
+font-size:16px;
+}
+.summary-cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+gap:14px;
+margin:16px 0;
+}
+.summary-card{
+background:#fff;
+border-radius:18px;
+padding:16px;
+box-shadow:var(--shadow);
+border:3px solid #ffffff;
+}
+.summary-card strong{
+display:block;
+font-size:24px;
+margin-top:6px;
+}
+
+
+.toggle-box-content{display:none;}
+.toggle-box-content.show{display:block;}
+.inner-toggle{
+margin:8px 0 10px;
+padding:10px 14px;
+background:#ffffff;
+border:2px solid #cbd5e1;
+border-radius:999px;
+font-weight:900;
+cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+<header>
+<h1>🌏 Jessy’s 2026 Travel Adventure Planner</h1>
+<p class="subtitle">Taiwan • Thailand • Camiguin • Boracay • SG-KL • South Korea • Notes • Receivables & Payables</p>
+</header>
+
+<div class="topbar">
+<button class="save" onclick="saveAll()">💾 Save Changes Offline</button>
+<button class="print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+<button class="reset" onclick="resetTrip()">🔄 Reset Saved Edits</button>
+</div>
+
+<nav class="tabs">
+<button class="tab-btn taiwan active" onclick="openTab('taiwan',this)">🇹🇼 Taiwan</button>
+<button class="tab-btn thailand" onclick="openTab('thailand',this)">🇹🇭 Thailand</button>
+<button class="tab-btn camiguin" onclick="openTab('camiguin',this)">🏝️ Camiguin</button>
+<button class="tab-btn boracay" onclick="openTab('boracay',this)">🌊 Boracay</button>
+<button class="tab-btn sgkl" onclick="openTab('sgkl',this)">🇸🇬 SG-KL 🇲🇾</button>
+<button class="tab-btn sokor" onclick="openTab('sokor',this)">🇰🇷 SoKor</button>
+<button class="tab-btn notes" onclick="openTab('notes',this)">📝 Notes</button>
+<button class="tab-btn money" onclick="openTab('money',this)">💰 Receivables & Payables</button>
+</nav>
+
+<main>
+
+<section id="taiwan" class="panel active">
+<div class="hero taiwan">
+<h2>🇹🇼 July 8–11 Taiwan Trip</h2>
+<p>Previous Taiwan trip structure: Day 1–4 editable itinerary cards.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Dates</div><div class="value">July 8–11</div></div>
+<div class="info"><div class="label">Main Route</div><div class="value">Taipei • Sun Moon Lake • Kaohsiung • Manila</div></div>
+<div class="info"><div class="label">Accommodation</div><div class="value">Cosmos Hotel • Jessy’s Apartment • Kaohsiung</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('taiwan')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="taiwan-attire-box">
+<div class="budget-title">👗 Recommended Attire for Taiwan</div>
+<button class="inner-toggle" onclick="toggleBox('taiwan-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="taiwan-attire-box-content">
+• Light shirts<br>• Shorts or skirts<br>• Comfortable walking shoes<br>• Umbrella or light rain jacket<br>• Cap and sunscreen
+</div>
+</div>
+<div class="budget-box" id="taiwan-must-visit-box">
+<div class="budget-title">🇹🇼 Must-Visit Places / Attractions in Taiwan</div>
+<button class="inner-toggle" onclick="toggleBox('taiwan-must-visit-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="taiwan-must-visit-box-content">
+• Taipei 101 (Observatory optional: NTD 600 / PHP 1,050)<br>
+• Ximending (Free entrance; food/shopping budget needed)<br>
+• CKS Memorial Hall (Free entrance)<br>
+• North Coast / Yehliu-style scenic stops (Transport/tour budget needed)<br>
+• Sun Moon Lake boat tour (NTD 300 / PHP 525)<br>
+• Wenwu Temple (Free entrance)<br>
+• Miyahara Taichung (Free entrance; snack budget needed)<br>
+• Alishan Forest Recreation Area (NTD 300 / PHP 525)<br>
+• Dome of Light (Free)<br>
+• Love River (Free; optional boat fee)
+</div>
+</div>
+<div class="budget-box" id="taiwan-budget-box">
+<div class="budget-title">💸 Estimated Taiwan Budget</div>
+<div>Excluding airfare tickets: about NTD 8,000–12,000 / PHP 14,000–21,000 per person. Includes local transportation, food, entrance fees, and accommodation estimates.</div>
+</div>
+<div class="days trip-details" id="taiwan-details">
+<div class="day-card"><div class="day-title">Day 1 — July 8: Arrival + Taipei</div>
+<div class="editable" contenteditable="true" data-key="taiwan-d1">MNL NAIA T3 → Taipei T1 (Airfare excluded)
+
+<span class="time-line">6:35 AM - 9:00 AM</span> - Flight arrival in Taipei (Airfare excluded)
+
+Jessy pickup at arrival (Free)
+
+Airport train to Taipei (Est. NTD 160 / PHP 280)
+
+Brunch in Taipei (Est. NTD 200–350 / PHP 350–615)
+
+<span class="time-line">11:30 AM</span> - Baggage drop (Free / depends on hotel)
+
+<span class="time-line">12:30 PM - 4:00 PM</span> - Taipei Zoo & Maokong Gondola (Zoo: Est. NTD 100 / PHP 175; Gondola: Est. NTD 120–260 / PHP 210–455)
+
+<span class="time-line">5:00 PM - 7:00 PM</span> - Hooters dinner (Est. NTD 500–900 / PHP 875–1,575)
+
+<span class="time-line">8:00 PM</span> - Taipei 101 (Observatory optional: Est. NTD 600 / PHP 1,050; Coffee option budget: Est. NTD 250–450 / PHP 440–790)
+
+<span class="time-line">10:00 PM</span> - Ximending (Free entrance; food/shopping budget: Est. NTD 200–500 / PHP 350–875)
+
+Hotel: Cosmos Hotel Taipei (Hotel cost depends on booking)</div>
+</div>
+<div class="day-card"><div class="day-title">Day 2 — July 9: Taipei + North Coast</div>
+<div class="editable" contenteditable="true" data-key="taiwan-d2"><span class="time-line">6:00 AM</span> - Wake up and prepare (Free)
+
+CKS Memorial Hall (Free entrance; MRT/transport: Est. NTD 30–80 / PHP 55–140)
+
+North Coast trip (Transport/private car/gas/tour share: Est. NTD 600–1,200 / PHP 1,050–2,100)
+
+Must-try Taipei foods (Meal budget: Est. NTD 500–900 / PHP 875–1,575)
+
+Accommodation: Jessy’s Apartment (Free / host stay)</div>
+</div>
+<div class="day-card"><div class="day-title">Day 3 — July 10: Sun Moon Lake + Kaohsiung</div>
+<div class="editable" contenteditable="true" data-key="taiwan-d3"><span class="time-line">6:00 AM</span> - Leave Changhua (Local transport: Est. NTD 50–150 / PHP 90–265)
+
+THSR Taichung station (Transfer: Est. NTD 50–150 / PHP 90–265)
+
+<span class="time-line">7:40 AM</span> - Bus 6670B to Sun Moon Lake (Est. NTD 200–400 / PHP 350–700)
+
+<span class="time-line">9:30 AM</span> - Wenwu Temple (Free entrance)
+
+<span class="time-line">10:30 AM</span> - Boat tour (Est. NTD 300 / PHP 525)
+
+<span class="time-line">11:30 AM</span> - Lunch at old street (Est. NTD 200–350 / PHP 350–615)
+
+<span class="time-line">1:00 PM</span> - Explore Sun Moon Lake (Free; optional bike/extra activity: Est. NTD 200–500 / PHP 350–875)
+
+<span class="time-line">4:00 PM</span> - Bus to Taichung railway station (Est. NTD 200–400 / PHP 350–700)
+
+<span class="time-line">6:30 PM</span> - Miyahara Taichung (Free entrance; ice cream/snack: Est. NTD 150–300 / PHP 265–525)
+
+<span class="time-line">8:00 PM</span> - THSR Taichung → Kaohsiung (Est. NTD 790–1,000 / PHP 1,385–1,750)
+
+<span class="time-line">9:45 PM</span> - Hotel check-in (Hotel cost depends on booking)
+
+Hotel: Lilong Hotel Kaohsiung (Hotel cost depends on booking)</div>
+</div>
+<div class="day-card"><div class="day-title">Day 4 — July 11: Alishan + Kaohsiung</div>
+<div class="editable" contenteditable="true" data-key="taiwan-d4">Morning
+
+Changhua → Chiayi (Train: Est. NTD 120–250 / PHP 210–440)
+
+Chiayi → Alishan (Bus: Est. NTD 240–300 / PHP 420–525)
+
+Alishan forest visit (Entrance: Est. NTD 300 / PHP 525)
+
+Alishan → Kaohsiung station (Bus/train estimate: NTD 500–900 / PHP 875–1,575)
+
+Dome of Light (Free entrance)
+
+Love River (Free entrance; optional boat: Est. NTD 150–200 / PHP 265–350)
+
+Must-try foods in Kaohsiung (Meal budget: Est. NTD 300–600 / PHP 525–1,050)
+
+<span class="time-line">18:30 PM</span> - Flight from KHH to Manila (Airfare excluded)
+
+<span class="time-line">20:00 PM</span> - Arrive in Manila (Airport transfer/food budget: Est. PHP 500–1,000 / NTD 290–580)</div>
+</div>
+</div>
+</section>
+
+<section id="thailand" class="panel">
+<div class="hero thailand">
+<h2>🇹🇭 July 13–19 Cebu to Thailand + Simala</h2>
+<p>Editable travel plan for Don Muang, Pattaya, and Bangkok.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Dates</div><div class="value">July 13–19</div></div>
+<div class="info"><div class="label">Route</div><div class="value">Cebu → Thailand</div></div>
+<div class="info"><div class="label">Suggested Focus</div><div class="value">Bangkok • Pattaya</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('thailand')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="thailand-attire-box">
+<div class="budget-title">👗 Recommended Attire for Thailand</div>
+<button class="inner-toggle" onclick="toggleBox('thailand-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="thailand-attire-box-content">
+• Breathable clothing<br>• Sandals<br>• Hat<br>• Sunglasses<br>• Temple cover-up for Wat Arun and Wat Pho
+</div>
+</div>
+<div class="budget-box" id="thailand-must-visit-box">
+<div class="budget-title">🇹🇭 Must-Visit Places / Attractions in Thailand</div>
+<button class="inner-toggle" onclick="toggleBox('thailand-must-visit-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="thailand-must-visit-box-content">
+• Terminal 21 Pattaya (Free entrance)<br>
+• Pattaya Floating Market (PHP 340–510 / NTD 200–300)<br>
+• Walking Street Pattaya (Free entrance)<br>
+• Nong Nooch Tropical Garden (PHP 850–1,360 / NTD 500–800)<br>
+• Underwater World Pattaya (PHP 935 / NTD 550)<br>
+• Wat Arun (PHP 340 / NTD 200)<br>
+• Wat Pho (PHP 510 / NTD 300)<br>
+• King Power Mahanakhon SkyWalk (PHP 1,835 / NTD 1,080)<br>
+• Safari World + Buffet (PHP 2,550–3,060 / NTD 1,500–1,800)<br>
+• Chao Phraya Princess Dinner Cruise (PHP 2,040–3,060 / NTD 1,200–1,800)<br>
+• Siam Paragon and Chatuchak Market (Free entrance; shopping budget needed)
+</div>
+</div>
+<div class="budget-box" id="thailand-budget-box">
+<div class="budget-title">💸 Estimated Thailand Budget</div>
+<div>Excluding airfare tickets: about PHP 16,000–24,000 / NTD 9,000–14,000 per person. Includes hotel, local transportation, food, activities, and shopping allowance.</div>
+</div>
+<div class="days trip-details" id="thailand-details">
+<div class="day-card"><div class="day-title">July 13 — Fly to Thailand</div><div class="editable"contenteditable="true" data-key="thai-d1">July 13
+
+<span class="time-line">1:00 PM - 2:40 PM</span> - Cebu to Manila flight (Airfare excluded)
+
+<span class="time-line">7:20 PM - 10:00 PM</span> - Manila to Bangkok flight (Airfare excluded)
+
+<span class="time-line">10:30 PM</span> - Arrival at Don Mueang Airport (Airport transfer to hotel: Est. PHP 250–500 / NTD 145–290)
+
+<span class="time-line">11:00 PM</span> - Check-in at Don Muang Hotel (Hotel cost depends on booking)
+
+Estimated daily budget excluding airfare tickets:
+PHP 2,300–3,300 / NTD 1,300–1,900</div></div>
+<div class="day-card"><div class="day-title">July 14 — Bangkok City</div><div class="editable"contenteditable="true" data-key="thai-d2">July 14
+
+<span class="time-line">9:00 AM</span> - Travel from Bangkok to Pattaya (Bus/Van: PHP 300–500 / NTD 175–290)
+
+<span class="time-line">11:00 AM</span> - Lunch and explore at Terminal 21 Pattaya (Free Entrance; lunch budget: PHP 300–700 / NTD 175–410)
+
+<span class="time-line">2:00 PM</span> - Airbnb check-in (Accommodation cost depends on booking)
+
+<span class="time-line">4:00 PM</span> - Pattaya Floating Market (Entrance: PHP 340–510 / NTD 200–300)
+
+<span class="time-line">7:00 PM</span> - Walking Street Pattaya (Free Entrance; food/transport budget: PHP 500–1,000 / NTD 290–580)
+
+Estimated daily budget excluding airfare tickets:
+PHP 2,000–3,000 / NTD 1,150–1,750</div></div>
+<div class="day-card"><div class="day-title">July 15 — Bangkok Food + Shopping</div><div class="editable"contenteditable="true" data-key="thai-d3">July 15
+
+<span class="time-line">9:00 AM</span> - Nong Nooch Tropical Garden (Entrance: PHP 850–1,360 / NTD 500–800; local transport: PHP 500–1,000 / NTD 290–580)
+
+<span class="time-line">12:00 PM</span> - Lunch at Pa Boon Café (Meal budget: PHP 500–1,000 / NTD 290–580)
+
+<span class="time-line">2:00 PM</span> - Underwater World Pattaya (Entrance: PHP 935 / NTD 550)
+
+<span class="time-line">5:30 PM</span> - Dinner by the beach (Meal budget: PHP 600–1,200 / NTD 350–700)
+
+<span class="time-line">7:30 PM</span> - Explore Pattaya Night Market (Free Entrance; shopping/food budget: PHP 300–800 / NTD 175–465)
+
+Estimated daily budget excluding airfare tickets:
+PHP 2,500–4,000 / NTD 1,450–2,300</div></div>
+<div class="day-card"><div class="day-title">July 16 — Pattaya</div><div class="editable" contenteditable="true" data-key="thai-d4">July 16
+
+<span class="time-line">8:00 AM</span> - Early travel from Pattaya to Bangkok (Bus/Van: PHP 300–500 / NTD 175–290)
+
+<span class="time-line">11:00 AM</span> - Lunch in Bangkok (Meal budget: PHP 300–700 / NTD 175–410)
+
+<span class="time-line">12:00 PM</span> - Baggage drop at the Airbnb (Free / depends on host)
+
+<span class="time-line">2:00 PM</span> - Visit Wat Arun (Entrance: PHP 340 / NTD 200; boat/transport: PHP 100–300 / NTD 60–175)
+
+<span class="time-line">3:00 PM</span> - Visit Wat Pho (Entrance: PHP 510 / NTD 300)
+
+<span class="time-line">4:30 PM</span> - King Power Mahanakhon SkyWalk (Entrance: PHP 1,835 / NTD 1,080)
+
+<span class="time-line">7:00 PM</span> - Dinner at Jodd Fairs or IconSiam (Meal budget: PHP 500–1,200 / NTD 290–700)
+
+<span class="time-line">8:30 PM onwards</span> - Explore nearby night market (Free Entrance; shopping/food budget: PHP 300–800 / NTD 175–465)
+
+Estimated daily budget excluding airfare tickets:
+PHP 3,000–5,000 / NTD 1,750–2,900</div></div>
+<div class="day-card"><div class="day-title">July 17 — Pattaya Free Day</div><div class="editable"contenteditable="true" data-key="thai-d5">July 17
+
+<span class="time-line">9:00 AM</span> - Safari World + International Buffet (Entrance + Buffet: PHP 2,550–3,060 / NTD 1,500–1,800; transport: PHP 700–1,500 / NTD 410–875)
+
+<span class="time-line">4:00 PM</span> - Back at the Airbnb to change clothes (Transport: PHP 300–700 / NTD 175–410)
+
+<span class="time-line">6:00 PM</span> - Chao Phraya Princess Dinner Cruise (Fee: PHP 2,040–3,060 / NTD 1,200–1,800; pier transfer: PHP 300–700 / NTD 175–410)
+
+Estimated daily budget excluding airfare tickets:
+PHP 5,000–7,000 / NTD 2,900–4,100</div></div>
+<div class="day-card"><div class="day-title">July 18 — Departure</div><div class="editable" contenteditable="true"data-key="thai-d6">July 18
+
+<span class="time-line">9:00 AM</span> - Visit Siam Paragon (Free Entrance; food/shopping budget: PHP 500–1,500 / NTD 290–875)
+
+<span class="time-line">11:00 AM</span> - Visit Chatuchak Market (Free Entrance; food/shopping budget: PHP 500–1,500 / NTD 290–875)
+
+<span class="time-line">2:00 PM</span> - Nap at the Airbnb or salon / spa before heading back to the Philippines (Salon/Spa: PHP 850–2,550 / NTD 500–1,500)
+
+<span class="time-line">8:00 PM</span> - Check out and head to Don Mueang Airport (Taxi/transfer: PHP 400–900 / NTD 235–525)
+
+<span class="time-line">11:00 PM</span> - Flight from Bangkok to Manila (Airfare excluded)
+
+July 19
+
+<span class="time-line">6:05 AM - 7:30 AM</span> - Manila to Cebu flight (Airfare excluded)
+
+<span class="time-line">Morning</span> - Simala tour (Entrance: Free; transportation budget: PHP 500–1,500 / NTD 290–875)
+
+<span class="time-line">3:00 PM</span> - Hotel check-in at Kaimito House (Hotel cost depends on booking)
+
+Estimated daily budget excluding airfare tickets:
+PHP 2,000–4,000 / NTD 1,150–2,300</div></div>
+</div>
+</section>
+
+<section id="camiguin" class="panel">
+<div class="hero camiguin">
+<h2>🏝️ July 19–August 4 Camiguin</h2>
+<p>Long-stay island rest, family time, and slow travel plan.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Dates</div><div class="value">July 19–August 4</div></div>
+<div class="info"><div class="label">Style</div><div class="value">Relaxed island stay</div></div>
+<div class="info"><div class="label">Editable</div><div class="value">Add your daily plans</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('camiguin')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="camiguin-attire-box">
+<div class="budget-title">👗 Recommended Attire for Camiguin</div>
+<button class="inner-toggle" onclick="toggleBox('camiguin-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="camiguin-attire-box-content">
+• Swimwear<br>• Rash guard<br>• Sandals<br>• Quick-dry clothing<br>• Waterproof bag
+</div>
+</div>
+<div class="budget-box" id="camiguin-must-visit-box">
+<div class="budget-title">🏝️ Must-Visit Places / Attractions in Camiguin</div>
+<button class="inner-toggle" onclick="toggleBox('camiguin-must-visit-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="camiguin-must-visit-box-content">
+• White Island (Boat/environmental fees: PHP 800–1,500 / NTD 465–875)<br>
+• Sunken Cemetery (PHP 100–300 / NTD 60–175)<br>
+• Old Church Ruins (Free / donation optional)<br>
+• Ardent Hot Spring or cold spring (PHP 50–100 / NTD 30–60 each)<br>
+• Waterfalls (PHP 50–200 / NTD 30–115)<br>
+• Local cafes and pasalubong spots (Food/shopping budget needed)<br>
+• Beach day and family bonding (Free; food/transport budget needed)
+</div>
+</div>
+<div class="budget-box" id="camiguin-budget-box">
+<div class="budget-title">💸 Estimated Camiguin Budget</div>
+<div>Excluding airfare tickets: about PHP 10,000–16,000 / NTD 5,800–9,300 per person. Includes local transport, food, entrance fees, island activities, and accommodation estimate.</div>
+</div>
+<div class="days trip-details" id="camiguin-details">
+<div class="day-card"><div class="day-title">Week 1 — July 20–26</div><div class="editable" contenteditable="true"data-key="camiguin-w1">July 19
+
+<span class="time-line">08:40 AM</span> - Flight to Camiguin (Airfare excluded)
+
+<span class="time-line">09:30 AM</span> - Arrive in Camiguin (Airport transfer: Est. PHP 200–500 / NTD 115–290)
+
+July 20–26
+
+Family time (Free)
+
+White Island (Boat/environmental fees estimate: PHP 800–1,500 / NTD 465–875)
+
+Sunken Cemetery (Boat/viewing/snack budget: PHP 100–300 / NTD 60–175)
+
+Old Church Ruins (Free entrance / donation optional: PHP 20–100 / NTD 12–60)
+
+Hot spring / cold spring (Entrance: PHP 50–100 / NTD 30–60 each)
+
+Rest day (Food/local transport budget: PHP 500–1,000 / NTD 290–580)</div></div>
+<div class="day-card"><div class="day-title">Week 2 — July 27–August 2</div><div class="editable"contenteditable="true" data-key="camiguin-w2">July 27–August 3
+
+Waterfalls (Entrance/guide/parking estimate: PHP 50–200 / NTD 30–115)
+
+Cafe / local food (Food budget: PHP 300–800 / NTD 175–465)
+
+Beach day (Free entrance; cottage/food budget: PHP 300–800 / NTD 175–465)
+
+Souvenir shopping (Budget: PHP 500–1,500 / NTD 290–875)
+
+Laundry / packing (Laundry budget: PHP 150–400 / NTD 90–235)
+
+Family bonding (Food budget: PHP 500–1,000 / NTD 290–580)
+
+Prepare for Boracay trip (Transport/errands budget: PHP 300–800 / NTD 175–465)</div></div>
+<div class="day-card"><div class="day-title">August 3 — Travel Day</div><div class="editable" contenteditable="true"data-key="camiguin-d3">August 4
+
+<span class="time-line">12:55 PM</span> - Camiguin to Cebu (Airfare excluded)
+
+<span class="time-line">13:45 PM</span> - Arrive in Cebu (Airport food/transfer budget: PHP 500–1,000 / NTD 290–580)
+
+<span class="time-line">15:15 PM</span> - Cebu to Boracay (Airfare excluded)
+
+<span class="time-line">16:20 PM</span> - Arrive in Boracay (Transfer fees: PHP 700–1,200 / NTD 410–700)
+
+Hotel check-in / rest (Hotel cost depends on booking)</div></div>
+</div>
+</section>
+
+<section id="boracay" class="panel">
+<div class="hero boracay">
+<h2>🌊 August 4–7 Boracay</h2>
+<p>Beach, sunset, food, and free-time planner.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Dates</div><div class="value">August 4–7</div></div>
+<div class="info"><div class="label">Main Activity</div><div class="value">Beach + Island Hopping</div></div>
+<div class="info"><div class="label">Vibe</div><div class="value">Relaxing tropical trip</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('boracay')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="boracay-attire-box">
+<div class="budget-title">👗 Recommended Attire for Boracay</div>
+<button class="inner-toggle" onclick="toggleBox('boracay-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="boracay-attire-box-content">
+• Swimwear<br>• Cover-up dress<br>• Flip-flops<br>• Sunglasses<br>• Waterproof phone pouch
+</div>
+</div>
+
+<div class="budget-box" id="boracay-must-try-box">
+<div class="budget-title">🌊 Must-Try Activities in Boracay</div>
+<button class="inner-toggle" onclick="toggleBox('boracay-must-try-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="boracay-must-try-box-content">
+
+• Crystal kayak photoshoot: PHP 250–500 / NTD 145–290<br>
+• Island hopping with snorkeling: PHP 1,000–1,800 / NTD 580–1,050<br>
+• Helmet diving: PHP 800–1,500 / NTD 465–875<br>
+• Parasailing: PHP 2,000–3,500 / NTD 1,165–2,040<br>
+• Sunset sailing / paraw: PHP 1,000–2,500 / NTD 580–1,460<br>
+• Cafe hopping and sunset dinner: PHP 800–1,500 / NTD 465–875
+
+</div>
+</div>
+
+<div class="budget-box" id="boracay-budget-box">
+<div class="budget-title">💸 Estimated Boracay Budget</div>
+<div>Excluding airfare tickets: about PHP 12,000–18,000 / NTD 7,000–10,500 per person. Includes hotel, food, local transportation, island hopping, and activities.</div>
+</div>
+<div class="days trip-details" id="boracay-details">
+<div class="day-card"><div class="day-title">August 4 — Arrival</div><div class="editable" contenteditable="true"data-key="bora-d1">August 4
+
+<span class="time-line">16:20 PM</span> - Arrive in Boracay (Airport/boat/terminal/transfer fees: PHP 700–1,200 / NTD 410–700)
+
+Hotel check-in (Hotel cost depends on booking)
+
+White Beach sunset (Free entrance)
+
+Dinner (Meal budget: PHP 500–1,000 / NTD 290–580)
+
+Must-try activity suggestion: Sunset photo walk along White Beach (Free)</div></div>
+<div class="day-card"><div class="day-title">August 5 — Activities Day</div><div class="editable"contenteditable="true" data-key="bora-d2">August 5
+
+Breakfast (Meal budget: PHP 200–500 / NTD 115–290)
+
+Beach time (Free entrance; beach mat/drinks budget: PHP 200–500 / NTD 115–290)
+
+Cafe / lunch (Meal budget: PHP 500–1,000 / NTD 290–580)
+
+Sunset photos (Free)
+
+Dinner (Meal budget: PHP 500–1,200 / NTD 290–700)
+
+Crystal kayak photoshoot (Est. PHP 250–500 / NTD 145–290)
+
+Island hopping (Est. PHP 1,000–1,800 / NTD 580–1,050)
+
+Snorkeling / beach stops (Usually included in island hopping; extra gear fee: PHP 100–300 / NTD 60–175)
+
+Helmet diving if budget allows (Est. PHP 800–1,500 / NTD 465–875)
+
+Parasailing if budget allows (Est. PHP 2,000–3,500 / NTD 1,165–2,040)
+
+Estimated daily budget excluding airfare tickets:
+PHP 4,000–8,000 / NTD 2,330–4,660</div></div>
+<div class="day-card"><div class="day-title">August 6 — Beach Day</div><div class="editable" contenteditable="true"data-key="bora-d3">August 6
+
+Sleep in (Free)
+
+White Beach walk (Free)
+
+Cafe hopping (Budget: PHP 500–1,000 / NTD 290–580)
+
+Beach day (Free entrance; beach mat/drinks budget: PHP 200–500 / NTD 115–290)
+
+Sunset viewing (Free)
+
+Massage by the beach (Est. PHP 400–1,000 / NTD 235–580)
+
+Dinner by the beach (Meal budget: PHP 500–1,200 / NTD 290–700)
+
+Pack luggage (Free)
+
+Estimated daily budget excluding airfare tickets:
+PHP 1,500–3,500 / NTD 875–2,040</div></div>
+<div class="day-card"><div class="day-title">August 7 — Boracay to Cebu</div><div class="editable"contenteditable="true" data-key="bora-d4">August 7
+
+Morning free time (Free)
+
+Souvenir shopping (Budget: PHP 500–1,500 / NTD 290–875)
+
+Check out (Free)
+
+<span class="time-line">13:45 PM</span> - Boracay to Cebu (Airfare excluded)
+
+<span class="time-line">14:44 PM</span> - Arrive in Cebu (Airport transfer/food budget: PHP 500–1,000 / NTD 290–580)
+
+Must-try activity suggestion: Buy calamansi muffins or local souvenirs before leaving (Budget: PHP 300–800 / NTD 175–465)</div></div>
+<div class="day-card"><div class="day-title">August 7–8 — Cebu to Singapore</div><div class="editable"contenteditable="true" data-key="bora-d5">August 7
+
+<span class="time-line">20:40 PM</span> - Cebu to Singapore (Airfare excluded)
+
+August 8
+
+<span class="time-line">00:30 AM</span> - Arrive in Singapore (Airport transfer/transport card budget: PHP 800–1,500 / NTD 465–875)</div></div>
+</div>
+</section>
+
+<section id="sgkl" class="panel">
+<div class="hero sgkl">
+<h2>🇸🇬🇲🇾 August 7–12 SG-KL + August 12–14 Cebu</h2>
+<p>Singapore and Kuala Lumpur budget-friendly editable plan.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Main Dates</div><div class="value">August 7–12</div></div>
+<div class="info"><div class="label">Extra Cebu</div><div class="value">August 12–14</div></div>
+<div class="info"><div class="label">Route</div><div class="value">Singapore • Kuala Lumpur • Manila • Cebu</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('sgkl')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="sgkl-attire-box">
+<div class="budget-title">👗 Recommended Attire for SG-KL</div>
+<button class="inner-toggle" onclick="toggleBox('sgkl-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="sgkl-attire-box-content">
+• Light casual clothing<br>• Comfortable walking shoes<br>• Umbrella<br>• Small backpack
+</div>
+</div>
+<div class="budget-box" id="sgkl-must-visit-box">
+<div class="budget-title">🇸🇬🇲🇾 Must-Visit Places / Attractions in SG-KL</div>
+<button class="inner-toggle" onclick="toggleBox('sgkl-must-visit-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="sgkl-must-visit-box-content">
+• Marina Bay Sands area (Free to explore)<br>
+• Merlion Park (Free)<br>
+• Gardens by the Bay outdoor gardens (Free; paid domes optional)<br>
+• Chinatown (Free entrance; food/shopping budget needed)<br>
+• Little India (Free entrance)<br>
+• Bugis / food center (Food/shopping budget needed)<br>
+• Petronas Towers outside photo spot (Free)<br>
+• KLCC (Free entrance)<br>
+• Batu Caves (Free entrance; transport budget needed)<br>
+• Central Market and Bukit Bintang (Free entrance; shopping/food budget needed)
+</div>
+</div>
+<div class="budget-box" id="sgkl-budget-box">
+<div class="budget-title">💸 Estimated SG-KL Budget</div>
+<div>Excluding airfare tickets: about PHP 25,000–35,000 / NTD 14,500–20,500 per person. Includes budget accommodation, food, public transportation, attractions, and sleeper bus.</div>
+</div>
+<div class="days trip-details" id="sgkl-details">
+<div class="day-card"><div class="day-title">August 8 — Singapore Arrival</div><div class="editable"contenteditable="true" data-key="sgkl-d1">August 8
+
+<span class="time-line">00:30 AM</span> - Arrive in Singapore (Airport transfer/transport card budget: PHP 800–1,500 / NTD 465–875)
+
+Hotel / hostel check-in (Accommodation cost depends on booking)
+
+Rest (Free)
+
+Marina Bay Sands area (Free to explore; SkyPark optional: PHP 1,500–2,000 / NTD 875–1,165)
+
+Merlion Park (Free entrance)
+
+Light show (Free entrance)</div></div>
+<div class="day-card"><div class="day-title">August 9 — Singapore City + Sleeper Bus</div><div class="editable"contenteditable="true" data-key="sgkl-d2">August 9
+
+Singapore city tour (Public transport budget: PHP 500–1,000 / NTD 290–580)
+
+Gardens by the Bay (Outdoor gardens free; paid domes estimate: PHP 1,600–2,500 / NTD 930–1,460)
+
+Chinatown (Free entrance; food/shopping budget: PHP 500–1,000 / NTD 290–580)
+
+Little India (Free entrance; food/shopping budget: PHP 300–800 / NTD 175–465)
+
+Bugis / food center (Food/shopping budget: PHP 500–1,500 / NTD 290–875)
+
+<span class="time-line">21:30 PM</span> - Sleeper bus to Kuala Lumpur (Est. PHP 1,800–3,000 / NTD 1,050–1,750)</div></div>
+<div class="day-card"><div class="day-title">August 11 — Kuala Lumpur Arrival</div><div class="editable"contenteditable="true" data-key="sgkl-d3">August 10
+
+Arrive in Kuala Lumpur (Local transfer: PHP 300–800 / NTD 175–465)
+
+Hotel check-in (Accommodation cost depends on booking)
+
+Petronas Towers (Outside photo free; observation deck optional: PHP 1,000–1,500 / NTD 580–875)
+
+KLCC (Free entrance; food/shopping budget: PHP 500–1,500 / NTD 290–875)
+
+Night market (Free entrance; food/shopping budget: PHP 500–1,500 / NTD 290–875)</div></div>
+<div class="day-card"><div class="day-title">August 11 — Kuala Lumpur</div><div class="editable"contenteditable="true" data-key="sgkl-d4">August 11
+
+Batu Caves (Free entrance; local transport: PHP 300–800 / NTD 175–465)
+
+Central Market (Free entrance; shopping budget: PHP 500–1,500 / NTD 290–875)
+
+Bukit Bintang (Free entrance; food/shopping budget: PHP 800–2,000 / NTD 465–1,165)
+
+Local food trip (Meal budget: PHP 500–1,200 / NTD 290–700)
+
+Pack luggage (Free)</div></div>
+<div class="day-card"><div class="day-title">August 12 — KL to Manila to Cebu</div><div class="editable"contenteditable="true" data-key="sgkl-d5">August 12
+
+<span class="time-line">00:55 AM</span> - Kuala Lumpur to Manila (Airfare excluded)
+
+<span class="time-line">05:20 AM</span> - Arrive in Manila (Airport food budget: PHP 300–800 / NTD 175–465)
+
+<span class="time-line">18:25 PM</span> - Manila to Cebu (Airfare excluded)
+
+<span class="time-line">20:00 PM</span> - Arrive in Cebu (Airport transfer: PHP 300–800 / NTD 175–465)</div></div>
+<div class="day-card"><div class="day-title">August 12–14 — Cebu</div><div class="editable" contenteditable="true"data-key="sgkl-cebu">August 12–14
+
+Stay in One Central Hotel Cebu (Hotel cost depends on booking)
+
+Rest (Free)
+
+Laundry (Est. PHP 150–400 / NTD 90–235)
+
+Family time (Food budget: PHP 500–1,500 / NTD 290–875)
+
+Prepare documents and luggage (Printing/errands budget: PHP 100–300 / NTD 60–175)
+
+August 14
+
+<span class="time-line">12:15 PM</span> - Flight back to Taiwan via EVA Air (Airfare excluded)
+
+<span class="time-line">15:30 PM</span> - Arrive in Taiwan (Airport transfer: Est. NTD 160–500 / PHP 280–875)</div></div>
+</div>
+</section>
+
+<section id="sokor" class="panel">
+<div class="hero sokor">
+<h2>🇰🇷 August 16–21 South Korea</h2>
+<p>Taipei to Busan, then Seoul to Taipei.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Dates</div><div class="value">August 16–21</div></div>
+<div class="info"><div class="label">Arrival</div><div class="value">Taipei → Busan</div></div>
+<div class="info"><div class="label">Departure</div><div class="value">Seoul → Taipei</div></div>
+</div>
+</div>
+<button class="toggle-btn" onclick="toggleDetails('sokor')">👀 Show / Hide Itinerary</button>
+<div class="budget-box" id="sokor-attire-box">
+<div class="budget-title">👗 Recommended Attire for South Korea</div>
+<button class="inner-toggle" onclick="toggleBox('sokor-attire-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="sokor-attire-box-content">
+• Light summer clothes<br>• Comfortable sneakers<br>• Thin cardigan for evenings<br>• Crossbody bag<br>• Portable fan
+</div>
+</div>
+
+<div class="budget-box" id="sokor-must-visit-box">
+<div class="budget-title">🇰🇷 Must-Visit Places & Must-Try Activities in South Korea</div>
+<button class="inner-toggle" onclick="toggleBox('sokor-must-visit-box-content')">👀 Show / Hide Details</button>
+<div class="toggle-box-content" id="sokor-must-visit-box-content">
+
+<strong>Busan</strong><br>
+• Haeundae Beach (Free)<br>
+• Gamcheon Culture Village (Free)<br>
+• Jagalchi Market (Free entrance; food budget: PHP 800–1,500 / NTD 465–875)<br>
+• BIFF Square (Free entrance; street food budget: PHP 500–1,000 / NTD 290–580)<br>
+• Gwangalli Beach (Free)<br>
+• Songdo Skywalk / Glass Walk (Free)<br>
+• Songdo Marine Cable Car (PHP 700–1,500 / NTD 410–875)<br>
+• Oryukdo Skywalk (Free)<br>
+• Busan X The Sky Observatory (PHP 1,200–2,000 / NTD 700–1,165)<br><br>
+<strong>Seoul</strong><br>
+• Gyeongbokgung Palace (PHP 130–200 / NTD 75–115)<br>
+• Bukchon Hanok Village (Free)<br>
+• Myeongdong (Free entrance; shopping/food budget needed)<br>
+• Hongdae (Free entrance; shopping/food budget needed)<br>
+• N Seoul Tower (Optional fee: PHP 600–900 / NTD 350–525)<br>
+• Insadong (Free)<br>
+• Starfield Library / COEX Mall (Free)<br>
+• Han River Night Picnic (PHP 300–800 / NTD 175–465)<br>
+• Lotte World (PHP 2,000–3,500 / NTD 1,165–2,040)<br><br>
+<strong>Must-Try Activities</strong><br>
+• Hanbok Rental (PHP 800–1,500 / NTD 465–875)<br>
+• Korean BBQ (PHP 800–2,000 / NTD 465–1,165)<br>
+• Convenience Store Food Challenge (PHP 300–800 / NTD 175–465)<br>
+• Han River Picnic (PHP 300–800 / NTD 175–465)<br>
+• Cafe Hopping (PHP 500–1,500 / NTD 290–875)<br>
+• Korean Photobooth Experience (PHP 200–500 / NTD 115–290)
+
+</div>
+</div>
+
+<div class="budget-box" id="sokor-budget-box">
+<div class="budget-title">💸 Estimated South Korea Budget</div>
+<div>Excluding airfare tickets: about PHP 30,000–43,000 / NTD 17,500–25,000 per person. Includes hotel, food, train/bus, attractions, and shopping allowance.</div>
+</div>
+<div class="days trip-details" id="sokor-details">
+<div class="day-card"><div class="day-title">August 16 — Taipei to Busan</div><div class="editable"contenteditable="true" data-key="kr-d1"><span class="time-line">2:50 AM - 6:10 AM</span> - Taipei to Busan flight (Airfare excluded)
+
+Arrival and hotel check-in (Airport transfer: PHP 500–1,000 / NTD 290–580; hotel cost depends on booking)
+
+Haeundae Beach / nearby dinner (Free entrance; meal budget: PHP 600–1,200 / NTD 350–700)</div></div>
+<div class="day-card"><div class="day-title">August 17 — Busan</div><div class="editable" contenteditable="true"data-key="kr-d2">Gamcheon Culture Village (Free entrance; transport/food budget: PHP 700–1,500 / NTD 410–875)
+
+Jagalchi Market (Free entrance; meal budget: PHP 800–1,500 / NTD 465–875)
+
+BIFF Square (Free entrance; street food budget: PHP 500–1,000 / NTD 290–580)
+
+Gwangalli Beach (Free entrance; cafe/dinner budget: PHP 800–1,500 / NTD 465–875)</div></div>
+<div class="day-card"><div class="day-title">August 18 — Busan to Seoul</div><div class="editable"contenteditable="true" data-key="kr-d3">KTX or flight to Seoul (Transport estimate excluding airfare option: PHP 2,500–4,500 / NTD 1,460–2,625)
+
+Hotel check-in (Hotel cost depends on booking)
+
+Myeongdong / Hongdae (Free entrance; food/shopping budget: PHP 1,000–2,500 / NTD 580–1,460)</div></div>
+<div class="day-card"><div class="day-title">August 19 — Seoul City</div><div class="editable"contenteditable="true" data-key="kr-d4">Gyeongbokgung Palace (Entrance: PHP 130–200 / NTD 75–115; hanbok rental optional: PHP 800–1,500 / NTD 465–875)
+
+Bukchon Hanok Village (Free entrance)
+
+Insadong (Free entrance; food/shopping budget: PHP 500–1,500 / NTD 290–875)
+
+Namsan / Myeongdong (Namsan cable car optional: PHP 600–900 / NTD 350–525; food/shopping budget: PHP 800–2,000 / NTD 465–1,165)</div></div>
+<div class="day-card"><div class="day-title">August 20 — Seoul Free Day</div><div class="editable"contenteditable="true" data-key="kr-d5">Cafe hopping (Budget: PHP 700–1,500 / NTD 410–875)
+
+Shopping (Budget depends on preference: PHP 1,000–3,000 / NTD 580–1,750)
+
+Optional tour (Est. PHP 2,000–4,000 / NTD 1,165–2,330)
+
+Pack luggage (Free)</div></div>
+<div class="day-card"><div class="day-title">August 21 — Seoul to Taipei</div><div class="editable"contenteditable="true" data-key="kr-d6">Check out (Free)
+
+Airport transfer (Est. PHP 500–1,000 / NTD 290–580)
+
+<span class="time-line">9:05 AM - 10:55 AM</span> - Incheon to Taoyuan flight (Airfare excluded)</div></div>
+</div>
+</section>
+
+<section id="notes" class="panel">
+<div class="hero notes">
+<h2>📝 Travel Notes</h2>
+<p>Type anything here. Click “Save Changes Offline” before closing the file.</p>
+</div>
+<textarea data-key="main-notes" placeholder="Write your notes, budget, packing list, booking details, reminders, and prayer intentions here..."></textarea>
+<details>
+<summary>Suggested Packing Checklist</summary>
+<ul>
+<li>Passport, IDs, tickets, hotel bookings</li>
+<li>Cash, cards, travel insurance copy</li>
+<li>Phone, charger, power bank, adapter</li>
+<li>Light clothes, comfy shoes, swimsuit, jacket</li>
+<li>Medicine, sunscreen, toiletries</li>
+</ul>
+</details>
+</section>
+
+
+<section id="money" class="panel">
+<div class="hero money">
+<h2>💰 Receivables and Payables</h2>
+<p>Input your trip expenses, receivables, and payables here. It works offline and automatically saves on this browser/device.</p>
+<div class="hero-grid">
+<div class="info"><div class="label">Total Receivables</div><div class="value" id="totalReceivables">0.00</div></div>
+<div class="info"><div class="label">Total Payables</div><div class="value" id="totalPayables">0.00</div></div>
+<div class="info"><div class="label">Balance</div><div class="value" id="netBalance">0.00</div></div>
+</div>
+</div>
+
+<div class="topbar">
+<button class="save" onclick="addMoneyRow()">➕ Add Row</button>
+<button class="print" onclick="calculateMoney()">🧮 Recalculate</button>
+<button class="reset" onclick="clearMoneyRows()">🗑️ Clear Money Table</button>
+</div>
+
+<table class="money-table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Date / Place</th>
+<th>Description</th>
+<th>Currency</th>
+<th>Amount</th>
+<th>Paid By / From</th>
+<th>Cash / Card</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="moneyBody"></tbody>
+</table>
+
+<div class="small-note">
+Tip: Use Receivable for money someone owes you. Use Payable for money you need to pay. Choose PHP or NTD, then select if it was paid by Cash or Card. Airfare tickets are excluded from the estimated itinerary budgets.
+</div>
+</section>
+
+</main>
+
+<script>
+const STORE_PREFIX = "jessy_2026_trip_";
+
+function openTab(id, btn){
+document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+btn.classList.add('active');
+localStorage.setItem(STORE_PREFIX + "activeTab", id);
+}
+
+function saveAll(showAlert=true){
+document.querySelectorAll('[data-key]').forEach(el=>{
+const key = el.dataset.key;
+const value = el.tagName.toLowerCase() === 'textarea' ? el.value : el.innerHTML;
+localStorage.setItem(STORE_PREFIX + key, value);
+});
+if(showAlert) alert("Saved offline on this browser/device! 💾");
+}
+
+function loadAll(){
+document.querySelectorAll('[data-key]').forEach(el=>{
+const key = el.dataset.key;
+const saved = localStorage.getItem(STORE_PREFIX + key);
+if(saved !== null){
+if(el.tagName.toLowerCase() === 'textarea') el.value = saved;
+else el.innerHTML = saved;
+}
+});
+const active = localStorage.getItem(STORE_PREFIX + "activeTab");
+if(active && document.getElementById(active)){
+const button = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick').includes("'" + active + "'"));
+if(button) openTab(active, button);
+}
+}
+
+function resetTrip(){
+if(confirm("This will remove your saved offline edits and return the planner to the original version. Continue?")){
+Object.keys(localStorage).forEach(k=>{
+if(k.startsWith(STORE_PREFIX)) localStorage.removeItem(k);
+});
+location.reload();
+}
+}
+
+let saveTimer;
+document.addEventListener('input', e=>{
+if(e.target.matches('[data-key]')){
+clearTimeout(saveTimer);
+saveTimer = setTimeout(()=>saveAll(false), 500);
+}
+});
+
+window.addEventListener('DOMContentLoaded', ()=>{ loadAll(); loadMoneyRows(); });
+
+function toggleDetails(id){
+const box = document.getElementById(id + "-details");
+if(box) box.classList.toggle("show");
+}
+
+
+function getMoneyRows(){
+const rows = [];
+document.querySelectorAll("#moneyBody tr").forEach(tr=>{
+rows.push({
+type: tr.querySelector(".money-type").value,
+date: tr.querySelector(".money-date").value,
+desc: tr.querySelector(".money-desc").value,
+currency: tr.querySelector(".money-currency").value,
+amount: tr.querySelector(".money-amount").value,
+person: tr.querySelector(".money-person").value,
+method: tr.querySelector(".money-method").value
+});
+});
+return rows;
+}
+
+function saveMoneyRows(){
+localStorage.setItem(STORE_PREFIX + "moneyRows", JSON.stringify(getMoneyRows()));
+}
+
+function addMoneyRow(data={}){
+const body = document.getElementById("moneyBody");
+if(!body) return;
+const tr = document.createElement("tr");
+tr.innerHTML = `
+<td>
+<select class="money-type">
+<option value="Receivable">Receivable</option>
+<option value="Payable">Payable</option>
+<option value="Paid">Paid</option>
+</select>
+</td>
+<td><input class="money-date" placeholder="e.g. Aug. 7 / SG"></td>
+<td><input class="money-desc" placeholder="e.g. Hotel, food, tour"></td>
+<td>
+<select class="money-currency">
+<option value="PHP">PHP</option>
+<option value="NTD">NTD</option>
+</select>
+</td>
+<td><input class="money-amount" type="number" min="0" step="0.01" placeholder="0.00"></td>
+<td><input class="money-person" placeholder="Name"></td>
+<td>
+<select class="money-method">
+<option value="Cash">Cash</option>
+<option value="Card">Card</option>
+</select>
+</td>
+<td><button onclick="this.closest('tr').remove(); calculateMoney(); saveMoneyRows();">Delete</button></td>
+`;
+body.appendChild(tr);
+tr.querySelector(".money-type").value = data.type || "Payable";
+tr.querySelector(".money-date").value = data.date || "";
+tr.querySelector(".money-desc").value = data.desc || "";
+tr.querySelector(".money-currency").value = data.currency || "PHP";
+tr.querySelector(".money-amount").value = data.amount || "";
+tr.querySelector(".money-person").value = data.person || "";
+tr.querySelector(".money-method").value = data.method || "Cash";
+tr.querySelectorAll("input,select").forEach(el=>{
+el.addEventListener("input", ()=>{ calculateMoney(); saveMoneyRows(); });
+el.addEventListener("change", ()=>{ calculateMoney(); saveMoneyRows(); });
+});
+calculateMoney();
+saveMoneyRows();
+}
+
+function calculateMoney(){
+let receivables = 0;
+let payables = 0;
+document.querySelectorAll("#moneyBody tr").forEach(tr=>{
+const type = tr.querySelector(".money-type").value;
+const amount = parseFloat(tr.querySelector(".money-amount").value) || 0;
+if(type === "Receivable") receivables += amount;
+if(type === "Payable") payables += amount;
+});
+const r = document.getElementById("totalReceivables");
+const p = document.getElementById("totalPayables");
+const n = document.getElementById("netBalance");
+if(r) r.textContent = receivables.toFixed(2);
+if(p) p.textContent = payables.toFixed(2);
+if(n) n.textContent = (receivables - payables).toFixed(2);
+}
+
+function loadMoneyRows(){
+const saved = localStorage.getItem(STORE_PREFIX + "moneyRows");
+if(saved){
+try{
+JSON.parse(saved).forEach(row=>addMoneyRow(row));
+}catch(e){
+addMoneyRow();
+}
+}else{
+addMoneyRow({type:"Payable", desc:"Accommodation", currency:"PHP"});
+addMoneyRow({type:"Payable", desc:"Food", currency:"PHP"});
+addMoneyRow({type:"Payable", desc:"Transportation", currency:"PHP"});
+addMoneyRow({type:"Receivable", desc:"Payment from travel companion", currency:"PHP"});
+}
+calculateMoney();
+}
+
+
+function toggleBox(id){
+const box = document.getElementById(id);
+if(box) box.classList.toggle("show");
+}
+
+</script>
+</body>
+</html>
